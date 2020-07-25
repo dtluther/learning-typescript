@@ -1,0 +1,141 @@
+// Basic Types //
+// boolean
+var isDone = false;
+// number
+// All numbers in TypeScript are  floating point values. TS supports decimal, hexadecimal, binary, and octal literls.
+var decimal = 6;
+var hex = 0xf00d;
+var binary = 10;
+var octal = 484;
+// string
+// Single or double quotes
+// Can also use `template strings` which can span multiple lines and have embedded expressions
+var color = "red";
+color = 'blue';
+var fullName = 'John Smith';
+var age = 37;
+var sentence = "Hello, my name is " + fullName + ".\n\nI'll be " + (age + 1) + " years old next month.";
+console.log(sentence);
+// array
+// Can be written one of two ways:
+// 1) The type of elements follows by []
+var list = [1, 2, 3];
+// 2) Use a generic array type, `Array<elemType>`
+var list2 = [1, 2, 3];
+// tuple
+// Tuple types allow you to express an array with a fixed number of elements which known types that need not be the same
+// 1) Declare a typle type
+var x;
+// 2) Initialize it
+x = ["hello", 10];
+console.log(x[0].substring(1));
+// The lines below have errors, and if uncommented we can see them
+// console.log(x[1].substring(1));
+// x[3] = 'world';
+// console.log(x[5].toString());
+// enum
+// An addition to the standard set of datatypes from JS
+// An enum is a way of giving more friendly names to sets of numeric values (like in C#)
+var Color;
+(function (Color) {
+    Color[Color["Red"] = 0] = "Red";
+    Color[Color["Green"] = 1] = "Green";
+    Color[Color["Blue"] = 2] = "Blue";
+})(Color || (Color = {}));
+var c = Color.Green;
+console.log(c);
+// By default, enums begin numbering at 0. This can be changed by manually setting the value of one of its members
+var Color1;
+(function (Color1) {
+    Color1[Color1["Red"] = 1] = "Red";
+    Color1[Color1["Green"] = 2] = "Green";
+    Color1[Color1["Blue"] = 3] = "Blue";
+})(Color1 || (Color1 = {}));
+var c2 = Color1.Green;
+// Or we can manually set all of them
+var ColorManual;
+(function (ColorManual) {
+    ColorManual[ColorManual["Red"] = 1] = "Red";
+    ColorManual[ColorManual["Green"] = 2] = "Green";
+    ColorManual[ColorManual["Blue"] = 4] = "Blue";
+})(ColorManual || (ColorManual = {}));
+var cMan = ColorManual.Green;
+// A useful feature is we can go from the numeric value to the name of the value in the enum
+var colorName = ColorManual[2];
+console.log(colorName);
+// any
+// Pretty sure we want to avoid any as much as possible, because essentially this just removes the power of typing.
+// It can be useful for working with existing JS, since you can gradually opt in to type checking.
+var notSure = 4;
+notSure = "maybe a string instead";
+notSure = false;
+// Apparently, in other languages, the `Object` type plays a similar role to TS's `any`.
+// However, TS `Object` only allows you to assign a value to them. You can't call arbitrary methods on them, even ones
+// that actually exists. NOTE: there is a non-primitive `object` type to use instead, talked about later.
+notSure.ifItExists(); // okay, ifItExists might exist at runtime
+notSure.toFixed(); // okay, toFixed exists (but the compiler doesn't check, because it's an any)
+var prettySure = 4;
+// prettySure.toFixed(); // Error: Property 'toFixed' doesn't exist on type 'Object'.
+// `any` can also be useful (Idk about this) if you know some part of the type, but not all.
+var someKnown = [1, true, "who knows"];
+someKnown[0] = false;
+// void
+// The opposite of any: the absence of having any type at all.
+// This is commonly seen as the return types of some functions that do not return a value.
+function warnUser() {
+    console.log("This is my warning message");
+}
+// void is not useful because you can only assign `null` (only if --stringNullChecks is not specified) or `undefined` to
+// them
+var unusable = undefined;
+unusable = null; // OK if `strictNullNecks` is not given
+// null and undefined
+// By default, they are subtypes of other types, like a `number` for instance.
+// However, when using the `--strictNullChecks` flag, `null` and `undefined` are only assignable to `any` and their
+// respective types (the one exception being `undefined` can also be be assigned to `void`), which helps avoid many
+// errors. In a case where you want to pass either a `string` or `null` or `undefined`, you can use the `union` type:
+// string | null | undefined
+// `union` is an advanced topic covered later.
+// NOTE: handbook encourages use of `--strictNullChecks`, when possible, but assume it is turned off for the purposes
+// of this handbook.
+var u = undefined;
+var n = null;
+// never
+// The types of values that never occur.
+// For instance, the return type for a function expression or an arrow function expression that always throws an
+// exception or one that never returns.
+// Variables also acquire the `never` type when narrows by any type guard that can never be true.
+// `never` is a subtype of, and assignable to every type. However, the opposite is not true. Even `any` isn't assignable
+// to `never`.
+// Ex 1) Function returning never must have unreachable endpoint:
+function error(message) {
+    throw new Error(message);
+}
+// 2) Inferred return type is `never`:
+function fail() {
+    return error("Something failed");
+}
+// 3) Function returing never must have unreachable endpoint
+function infiniteLoop() {
+    while (true) {
+    }
+}
+create({ prop: 0 }); // OK
+// create(null); // OK
+// create(42); // Error
+// create("string"); // Error
+// create(false); // Error
+create(undefined); // Says it's Error in handbook, but I don't get one...
+// Type assertions
+// In cases where we know more about a value than TS does, i.e. when we know the type of some entity could be more
+// specific than its current type, we can use type assertions to tell the compiler "trust me, I know what I'm doing." A
+// type assertion is like a type cast in other languages, but it performs not special checking or restructuring of data.
+// It has no runtime impact, and it is used purely by the compiler. TS assumes that the programmer has performed any
+// any special checks they need.
+// Two forms:
+// 1) "angle-bracket" syntax:
+var someValue = "this is a string";
+var strLength = someValue.length;
+// 2) "as" syntax: (NOTE when using TS with JSX, only "as" assertions are allowed!)
+var anotherValue = "string number 2";
+var anotherLength = anotherValue.length;
