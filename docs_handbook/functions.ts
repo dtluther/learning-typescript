@@ -133,3 +133,142 @@ let employeeName = buildLotsOfNames("Joseph", "Samuel", "Lucas", "MacKinzie");
 // Rest parameters are treated as a boundless number of optional parameters, and the compiler will build them into an
 // array. Can also be used in the type of function:
 let buildNameFunc: (firstName: string, ...restOfName: string[]) => string = buildLotsOfNames;
+/////
+
+//// `this` and arrow functions!!! (JS review below)
+// `this` is set whena a function IS called!
+// Arrow functions 'capture' the variable this (so arrow functions are closures, because they are capturing a variable
+// from outside their scope)
+
+let deck = {
+    suits: ["hearts", "spades", "clubs", "diamonds"],
+    cards: Array(52),
+    createCardPicker: function() {
+        return function() { // there is an inherent `this` that is left unassigned, so it will be assigned when called
+            let pickedCard = Math.floor(Math.random() * 52);
+            let pickedSuit = Math.floor(pickedCard / 13);
+    
+            return { suit: this.suits[pickedSuit], card: pickedCard % 13 };
+        };
+    }
+};
+
+let cardPicker = deck.createCardPicker(); // returns the function with an unbound `this`
+let pickedCard = cardPicker(); // now the returned function is finally called, and `this` is bound to the calling
+// object, which is the `global` object here and the `window` in the browser.
+alert("card: " + pickedCard.card + " of " + pickedCard.suit);
+
+// With arrow functions, we can capture the variable `this` where the function is created, rather than where it is
+// invoked:
+let deckWithArrowFunc = {
+    suits: ["hearts", "spades", "clubs", "diamonds"],
+    cards: Array(52),
+    createCardPicker: function() {
+        console.log(this);
+        return () => { // arrow function captures `this` right here, which will be an instance of a `deck` object
+            console.log(this);
+            let pickedCard = Math.floor(Math.random() * 52);
+            let pickedSuit = Math.floor(pickedCard / 13);
+    
+            return { suit: this.suits[pickedSuit], card: pickedCard % 13 };
+        };
+    }
+};
+
+cardPicker = deckWithArrowFunc.createCardPicker();
+pickedCard = cardPicker();
+
+alert("card: " + pickedCard.card + " of " + pickedCard.suit); 
+
+// Now the great thing about TS is that it will warn you when you make this mistake if you pass the `--noImplicitThis`
+// flag to the compiler. It will point out that `this` in `this.suits[pickedSuit]` is of type `any`.
+
+//// `this` parameters
+// `this` has the type `any` because `this` comes from the function expression inside the object literal. To solve this
+// problem, we can assign an explicit `this` parameter, which is a fake parameter that comes first in the parameter list
+// of a function:
+function f(this: void) {
+    `Make sure \`this\` is unusable in this standalone function.`;
+}
+
+// let's make the above deck and card situation more better
+// starting with types:
+interface Card {
+    suit: string;
+    card: number;
+}
+
+interface Deck {
+    suits: string[];
+    cards: number[];
+    createCardPicker(this: Deck): () => Card;
+}
+// createCardPicker is a function taking a parameter list (just `this`) and returns a function that returns a `Card`
+
+let tsDeck: Deck = {
+    suits: ["hearts", "spades", "clubs", "diamonds"],
+    cards: Array(52),
+    createCardPicker: function (this: Deck) {
+        return () => {
+            let pickedCard = Math.floor(Math.random() * 52);
+            let pickedSuit = Math.floor(pickedCard / 13);
+            
+            return { suit: this.suits[pickedSuit], card: pickedCard % 13 }
+        }
+    }
+}
+
+let tsCardPicker = deck.createCardPicker();
+let tsPickedCard = cardPicker();
+
+alert("card: " + pickedCard.card + " of " + pickedCard.suit);
+
+/// this parameter in callbacks
+// I think this is specific, but good to be aware of, and at least to know I can find it here
+// In order to avoid errors with `this` in callbacks (say, in a library), the [library author] needs to annotate the
+// callback type with `this`:
+interface UIElement {
+    addClickListener(onclick: (this: void, e: Event) => void): void;
+}
+
+class Handler {
+    info: string;
+    onClickBad(this: Handler, e: Event) {
+        // oops, used `this` here. using this callback would crash at runtime
+        this.info = e.message;
+    }
+}
+let h = new Handler();
+let uiElement = {} as UIElement;
+uiElement.addClickListener(h.onClickBad); // error!
+// Here we said that `onClickBad` must be called on an instance of `Handler`. Then, the compiler sees addClickListener.
+// In our interface, we said that addClickListener requires a function as a parameter. That function requires `this` to
+// be a `void` type. So in `onClickBad`, we said `this` is type `Handler`, which breaks the contract of our interface.
+// So to fix it, we need to change the type of this:
+class BetterHandler {
+    info: string;
+    onClickGood(this: void, e: Event) {
+        // can't use `this` here because it's of type void!
+        this.info = e.message;
+        console.log("clicked!");
+    }
+}
+let bh = new BetterHandler();
+uiElement.addClickListener(bh.onClickGood);
+// Because `onClickGood` specified that its `this` is `void`, it can be passed to `addClickListener`. Of course, this
+// also means we can't use `this.info` because "Property 'info' does not exist on type 'void'.ts(2339)". If we want to
+// use both, we need an arrow function:
+class ArrowHandler {
+    info: string;
+    onClickArrow = (e: Event) => {
+        this.info = e.message;
+    }
+}
+let ah = new ArrowHandler();
+uiElement.addClickListener(ah.onClickArrow);
+// This works because arrow functions use the outer `this`, so we can always pass them to something that expects 
+// `this: void`. <-- I don't understand why it's okay to pass an instance of `Handler` (or any object) to a `void` type
+// yet...
+// The downside is that one arrow function is created per object of type Handler. Methods, on the other hand, are only
+// created once and attached to the Handler's protyotype. <-- Ahhh interesting! Good to know, so this makes them shared
+// among all instances of type Handler without duplicating functions.
