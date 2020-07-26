@@ -107,9 +107,11 @@ let strictlyTyped: unknown = 4;
 // NOTE: `any` will propagate through your objects:
 let evenLooser: any = {};
 let d = evenLooser.a.b.c.d; // so d is type `any`
-// Apparently, in other languages, the `Object` type plays a similar role to TS's `any`.
+
+// NOTE: Apparently, in other languages, the `Object` type plays a similar role to TS's `any`.
 // However, TS `Object` only allows you to assign a value to them. You can't call arbitrary methods on them, even ones
 // that actually exists. NOTE: there is a non-primitive `object` type to use instead, talked about later.
+let notSure: any = 4;
 notSure.ifItExists(); // okay, ifItExists might exist at runtime
 notSure.toFixed(); // okay, toFixed exists (but the compiler doesn't check, because it's an any)
 let prettySure: Object = 4;

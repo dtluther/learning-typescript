@@ -16,6 +16,13 @@ var fullName = 'John Smith';
 var age = 37;
 var sentence = "Hello, my name is " + fullName + ".\n\nI'll be " + (age + 1) + " years old next month.";
 console.log(sentence);
+// Which is basically equivalent to:
+var sentence2 = "Hello, my name is " +
+    fullName +
+    ".\n\n" +
+    "I'll be " +
+    (age + 1) +
+    " years old next month.";
 // array
 // Can be written one of two ways:
 // 1) The type of elements follows by []
@@ -63,15 +70,40 @@ var cMan = ColorManual.Green;
 // A useful feature is we can go from the numeric value to the name of the value in the enum
 var colorName = ColorManual[2];
 console.log(colorName);
-// any
-// Pretty sure we want to avoid any as much as possible, because essentially this just removes the power of typing.
+// unknown
+// We may need to describe the type of variables we do not know when writing an application, such as values that come
+// from dynamic content -- e.g. from the user -- or we may want to accept all values in our API (really...?).
+var whoKnows = 4;
+whoKnows = "maybe a string instead";
+whoKnows = false;
+// const aNumber: number = maybe; // Error: "Type 'unknown' is not assignable to 'number'."
+// a) comparison check:
+if (maybe === true) {
+    // TS knows that 'maybe' is now a boolean now
+    var aBoolean = maybe;
+    // const aString: string = maybe; // so it cannot be a string
+}
+// b) `typeof` check:
+if (typeof maybe === "string") {
+    // TS knows that 'maybe' is now a string now
+    var aString = maybe;
+}
+var str = getValue("myString"); // Would be checked at run time
 // It can be useful for working with existing JS, since you can gradually opt in to type checking.
-var notSure = 4;
-notSure = "maybe a string instead";
-notSure = false;
-// Apparently, in other languages, the `Object` type plays a similar role to TS's `any`.
+// Unlike `unknown`, type `any` variables allow you access arbitrary properties, even ones that don't exist. These
+// properties include functions and TS will not check their existence or type:
+var looselyTyped = 4;
+looselyTyped.ifItExists(); // Ok, ifItExists might exist at runtime
+looselyTyped.toFixed(); // okay, toFixed exists (but the compiler doesn't check, because it's an any)
+var strictlyTyped = 4;
+// strictlyTyped.toFixed(); // Error: "Property 'toFixed' does not exist on type 'unknown'."
+// NOTE: `any` will propagate through your objects:
+var evenLooser = {};
+var d = evenLooser.a.b.c.d; // so d is type `any`
+// NOTE: Apparently, in other languages, the `Object` type plays a similar role to TS's `any`.
 // However, TS `Object` only allows you to assign a value to them. You can't call arbitrary methods on them, even ones
 // that actually exists. NOTE: there is a non-primitive `object` type to use instead, talked about later.
+var notSure = 4;
 notSure.ifItExists(); // okay, ifItExists might exist at runtime
 notSure.toFixed(); // okay, toFixed exists (but the compiler doesn't check, because it's an any)
 var prettySure = 4;
