@@ -272,3 +272,40 @@ uiElement.addClickListener(ah.onClickArrow);
 // The downside is that one arrow function is created per object of type Handler. Methods, on the other hand, are only
 // created once and attached to the Handler's protyotype. <-- Ahhh interesting! Good to know, so this makes them shared
 // among all instances of type Handler without duplicating functions.
+/////
+
+//// Overloads
+// JS is very dynamic, and a single function can return different types of objects based on the shape of objects passed
+// in. In TS, we descrbie this by supplying multiple function types for the same function as a list of overloads:
+let suits = ['hearts', 'spades', 'clubs', 'diamonds'];
+
+function pickCard(x: { suit: string, card: number }[]): number; // takes array of objects and returns a number
+function pickCard(x: number): { suit: string; card: number }; // takes a number returs an object
+function pickCard(x: any): any { // not part of the overload list, any param type other than the above two would error
+    // check to see if we're working with an object/array <-- wait, I thought that's an array of objects?
+    // if so, they gave us a deck, and we'll pick the card
+    if (typeof x === 'object') {
+        let pickedCard = Math.floor(Math.random() * x.length);
+        return pickedCard;
+    }
+    // otherwise if they pass in a number just let them pick a card:
+    else if (typeof x === 'number') {
+        let pickedSuit = Math.floor(x / 13);
+        return { suit: suits[pickedSuit], card: x % 13 };
+    }
+}
+
+let myDeck = [
+    { suit: "diamonds", card: 2 },
+    { suit: "spades", card: 10 },
+    { suit: "hearts", card: 4 }
+];
+let pickedCard1 = myDeck[pickCard(myDeck)];
+alert("card: " + pickedCard1.card + " of " + pickedCard1.suit);
+
+let pickedCard2 = pickCard(15);
+alert("card: " + pickedCard2.card + " of " + pickedCard2.suit);
+
+// Following a similar pattern to the underlying JS, the compiler proceeds with the first overload, attempts to call the
+// function with the provided params, If it finds a match, it picks that overload, otherwise it trys the next one.
+// Hence, it makes sense to order the overloads from most specific to least specific.
