@@ -359,12 +359,15 @@ department = new AccountingDepartment(); // ok to create and assign a non-abstra
 department.printName();
 department.printMeeting();
 department.generateReports(); // error: method doesn't exist on declared abstract type
+// This last one is interesting because an abstract class can only exist in type, but not in instance. So we can have
+// type (shape) `Department` but never an instance of class `Department`
 /////
 
 //// Advanced techniques
 /// Constructor functions
-// When we declare a class in TS, we are actually creating multiple function declarations at the same time. The first is
-// the type of the 'instance' of the class:
+// When we declare a class in TS, we are actually creating multiple function declarations at the same time: the type of
+// the instances of the class, and a constructor function.
+// First, let's check out the type of the 'instance' of the class:
 class OtherGreeter {
     greeting: string;
     constructor(message: string) {
@@ -379,18 +382,19 @@ let otherGreeter: OtherGreeter;
 otherGreeter = new OtherGreeter("world");
 console.log(otherGreeter.greet()); // "Hello, world"
 
-// `let greeter: Greeter` defines the instances of the `Greeter` class as also of type `Greeter`.
+// `let otherGreeter: OtherGreeter` defines the instances of the `OtherGreeter` class as also of type `OtherGreeter`.
+
 // We're also creating another value that we call the 'constructor function'. This is the function that is called when
 // we `new` up instances of the class. To see what this looks like in practice, lets check out the JS created by the
 // above example:
-let GreeterJS = (function() {
-    function GreeterJS(message) {
+let GreeterJS = (function() { // this whole thing is the constructor function, i.e. what happens when we call `new`
+    function GreeterJS(message) { // I think this is static (class) member
         this.greeting = message;
     }
-    GreeterJS.prototype.greet = function() {
+    GreeterJS.prototype.greet = function() { // I think this is an instance member, as it's attached to the prototype
         return "Hello, " + this.greeting;
     };
-    return GreeterJS;
+    return GreeterJS; // the constructor function returns this a new GreeterJS object
 })();
   
 let greeterJS;
@@ -417,10 +421,11 @@ let greeter1: GreeterJS2;
 greeter1 = new GreeterJS2();
 console.log(greeter1.greet()); // "Hello, there"
 
-let greeterMaker: typeof GreeterJS2 = GreeterJS2;
+let greeterMaker: typeof GreeterJS2 = GreeterJS2; // we do this because are making another constructor function, so we
+// want the type of the class, not the type of an instance
 greeterMaker.standardGreeting = "Hey there!";
 
-let greeter2: GreeterJS2 = new greeterMaker();
+let greeter2: GreeterJS2 = new greeterMaker(); // so now we can call `new` on greeterMaker and create an instance
 console.log(greeter2.greet()); // "Hey there!"
 
 // `greeter1` works as we've seen before.
@@ -430,3 +435,20 @@ console.log(greeter2.greet()); // "Hey there!"
 // the constructor function. This type will contain all of the static members of Greeter along with the constructor that
 // creates instances of the `Greeter` class. We show this by using `new` on greeterMaker, creating new instances of
 // `Greeter` and invoking them as before.
+/////
+
+//// Using a class as an interface
+// As we mentioned, a class declaraton creates 2 things:
+// 1) a type representing the instances of the class
+// 2) a constructor function
+// Because classes create types, we can use them in the same place we would be able to use interfaces:
+class AnotherPoint {
+    x: number;
+    y: number;
+}
+
+interface Point3d extends Point {
+    z: number;
+}
+
+let point3d: Point3d = { x: 1, y: 2, z: 3 }
