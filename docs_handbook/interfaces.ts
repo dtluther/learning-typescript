@@ -1,6 +1,6 @@
 // Interfaces //
 // A core principle of TypeScript is focusing on the *shape* an object has (often called "duck typing" or "structural
-// typing"). Interfaces are the way of naming these types, and sort of act as contracts within youre code.
+// typing"). Interfaces are the way of naming these types, and sort of act as contracts within your code.
 
 //// Simple example to demonstrate
 function simplePrintLabel(labeledObj: { label: string }) {

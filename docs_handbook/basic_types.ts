@@ -46,9 +46,9 @@ let x: [string, number];
 x = ["hello", 10];
 console.log(x[0].substring(1));
 // The lines below have errors, and if uncommented we can see them
-// console.log(x[1].substring(1));
-// x[3] = 'world';
-// console.log(x[5].toString());
+console.log(x[1].substring(1));
+x[3] = 'world';
+console.log(x[5].toString());
 
 // enum
 // An addition to the standard set of datatypes from JS
@@ -82,12 +82,11 @@ if (maybe === true) {
     const aBoolean: boolean = maybe;
     // const aString: string = maybe; // so it cannot be a string
 }
-// b) `typeof` check:
+// b) `typeof` check (type guards):
 if (typeof maybe === "string") {
     // TS knows that 'maybe' is now a string now
     const aString: string = maybe;
 }
-
 
 // any
 // Pretty sure we want to avoid any as much as possible, because essentially this just removes the power of typing.
