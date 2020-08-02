@@ -209,7 +209,7 @@ interface StringArray {
 }
 
 let myArray: StringArray;
-myArray = ["Bob", "Fred"]:
+myArray = ["Bob", "Fred"];
 
 let myStr: string = myArray[0];
 
