@@ -166,3 +166,33 @@ async function waitUntilDone(): Promise<void> {
 };
 
 waitUntilDone();
+
+type Cat = { name: string, purrs: boolean };
+type Dog = { name: string, barks: boolean, wags: boolean };
+type CatOrDogOrBoth = Cat | Dog
+type CatAndDog = Cat & Dog
+
+let cat: CatOrDogOrBoth = {
+    name: 'Bonkers',
+    purrs: true
+}
+
+let dog: CatOrDogOrBoth = {
+    name: 'domino',
+    barks: true,
+    wags: true
+}
+
+let both: CatOrDogOrBoth =  {
+    name: 'Donkers',
+    purrs: true,
+    barks: true,
+    wags: true
+}
+
+let combined: CatAndDog = { // requires all properties, where as Unions require one or the other
+    name: 'Combo',
+    purrs: true,
+    barks: true,
+    wags: true
+}
