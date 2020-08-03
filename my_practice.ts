@@ -140,17 +140,17 @@ rejectedTwo.catch(error => console.log("rejectedTwo:", error));
 const asyncFn: () => Promise<void> = async () => console.log('async function');
 console.log('This is asyncFn() output -->', asyncFn());
 
-const a: string = 'One';
-const b: Promise<string> = new Promise((resolve, _) => resolve("Two"));
-const c: Promise<Error> = new Promise((_, reject) => reject(new Error("Three")));
+const x: string = 'One';
+const y: Promise<string> = new Promise((resolve, _) => resolve("Two"));
+const z: Promise<Error> = new Promise((_, reject) => reject(new Error("Three")));
 
 async function gilad(): Promise<void> {
-    const four: string = await a; // setTimeout(() => {}, 0), so still async but goes straight to callback queue
-    console.log({ a: four });
-    const five: string = await b;
-    console.log({ b: five });
+    const four: string = await x; // setTimeout(() => {}, 0), so still async but goes straight to callback queue
+    console.log({ x: four });
+    const five: string = await y;
+    console.log({ y: five });
     try {
-        const six: Error = await c;
+        const six: Error = await z;
         console.log("This ain't gonna print.");
     }
     catch{
@@ -196,3 +196,12 @@ let combined: CatAndDog = { // requires all properties, where as Unions require 
     barks: true,
     wags: true
 }
+
+let a = 1042;
+let b = 'apples and oranges';
+const c = 'pineapples';
+let d = [true, true, false];
+let e = { type: 'ficus' }
+let f = [1, false]
+const g = [3]
+let h = null

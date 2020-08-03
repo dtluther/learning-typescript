@@ -10,10 +10,10 @@ interface Person {
 	lastName: string;
 }
 
-function greeter(person: Person) {
+function sayHello(person: Person) {
 	return "Hello, " + person.firstName + " " + person.lastName;
 }
 
 let user = new Student("Jane", 'M.', "User");
 
-document.body.textContent = greeter(user)
+document.body.textContent = sayHello(user)

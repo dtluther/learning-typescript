@@ -1,0 +1,14 @@
+// https://www.typescriptlang.org/docs/handbook/tsconfig-json.html
+{
+    "compilerOptions": {
+        "lib": ["es2015", "dom"],
+        "outDir": "lib",
+        "target": "ES2015",
+        "noImplicitAny": true
+        // "removeComments": true
+        // "sourceMap": true
+    },
+    // "include": [
+    //     "docs_handbook/*"
+    // ]
+}
