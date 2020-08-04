@@ -1,3 +1,5 @@
+var nodeFetch = require('node-fetch');
+
 // let fn: () => string = () => {
 //     console.log('It has been 5 seconds');
 //     return 'test';
@@ -12,12 +14,14 @@
 // //     const data = await res.json;
 // //     console.log(data);
 // // }
-// const api: string = 'https://api.github.com/repos/javascript-tutorial/en.javascript.info/commits';
-// // const myAsyncFetch = async (url: string): Promise<T> => {
-// //     const response = await fetch(url);
-// //     const body = await response.json();
-// //     return body;
-// // }
+const api: string = 'https://api.github.com/repos/javascript-tutorial/en.javascript.info/commits';
+const myAsyncFetch = async <T>(url: string): Promise<T> => {
+    const response = await nodeFetch(url);
+    const body = await response.json();
+    return body;
+}
+const asb = myAsyncFetch(api);
+setTimeout(() => console.log(asb), 1000)
 
 // // async function makeRequest(url: string): Promise<T> {
 // //     const response = await fetch(url);
@@ -41,4 +45,3 @@
 //     3) If true, it returnd the resolve, if false, it returns the reject
 // */
 
-const test: Promise<string> = new Promise((resolve, reject) => resolve('done'));
